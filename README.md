@@ -40,12 +40,12 @@ That's it. `start.bash` will:
 
 ---
 
-## 🔑 Azure OpenAI (Pre-Configured)
+## 🔑 Azure OpenAI 
 
 Your `.env` is already filled with your Azure credentials:
 
 ```env
-AZURE_OPENAI_API_KEY=YOUR_AZURE_API_KEY_HERE
+AZURE_OPENAI_API_KEY=
 AZURE_OPENAI_ENDPOINT=
 AZURE_OPENAI_DEPLOYMENT=
 AZURE_OPENAI_MODEL_DEPLOYMENT_NAME=
