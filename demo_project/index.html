@@ -1,0 +1,402 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>TaskMaster — Demo App</title>
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  
+  :root {
+    --bg: #0f0e17;
+    --surface: #1a1a2e;
+    --surface2: #16213e;
+    --accent: #ff6b6b;
+    --accent2: #4ecdc4;
+    --text: #fffffe;
+    --muted: #a7a9be;
+    --border: #2d2d44;
+  }
+
+  body {
+    font-family: 'Segoe UI', system-ui, sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+  }
+
+  nav {
+    background: var(--surface);
+    border-bottom: 1px solid var(--border);
+    padding: 0 24px;
+    display: flex;
+    align-items: center;
+    gap: 32px;
+    height: 60px;
+  }
+  .logo { font-weight: 800; font-size: 1.2rem; color: var(--accent); }
+  nav a { color: var(--muted); text-decoration: none; font-size: 0.9rem; transition: color 0.2s; }
+  nav a:hover, nav a.active { color: var(--text); }
+  .nav-right { margin-left: auto; display: flex; gap: 12px; align-items: center; }
+  .btn { padding: 8px 16px; border-radius: 8px; font-size: 0.875rem; cursor: pointer; border: none; }
+  .btn-primary { background: var(--accent); color: white; font-weight: 600; }
+  .btn-outline { background: transparent; color: var(--text); border: 1px solid var(--border); }
+
+  .hero {
+    text-align: center;
+    padding: 80px 24px 40px;
+  }
+  .hero h1 { font-size: 3rem; font-weight: 800; line-height: 1.1; }
+  .hero h1 span { color: var(--accent); }
+  .hero p { color: var(--muted); margin-top: 16px; font-size: 1.1rem; }
+
+  .app-container {
+    max-width: 640px;
+    margin: 0 auto;
+    padding: 0 24px 80px;
+  }
+
+  /* Login Form */
+  #login-section {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 32px;
+    margin-bottom: 32px;
+  }
+  #login-section h2 { margin-bottom: 20px; font-size: 1.25rem; }
+
+  .form-group { margin-bottom: 16px; }
+  label { display: block; font-size: 0.8rem; color: var(--muted); margin-bottom: 6px; text-transform: uppercase; letter-spacing: 0.5px; }
+  input[type="email"], input[type="password"], input[type="text"] {
+    width: 100%;
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 10px 14px;
+    color: var(--text);
+    font-size: 0.95rem;
+    outline: none;
+    transition: border-color 0.2s;
+  }
+  input:focus { border-color: var(--accent); }
+  .error-msg { color: #ff6b6b; font-size: 0.8rem; margin-top: 8px; display: none; }
+
+  /* Todo Section */
+  #todo-section { display: none; }
+  .todo-input-row {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 24px;
+  }
+  .todo-input-row input { flex: 1; }
+
+  .todo-list { list-style: none; }
+  .todo-item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 14px 16px;
+    margin-bottom: 8px;
+    transition: border-color 0.2s;
+  }
+  .todo-item:hover { border-color: var(--accent2); }
+  .todo-item.done { opacity: 0.5; }
+  .todo-item.done span { text-decoration: line-through; color: var(--muted); }
+  .todo-check { width: 20px; height: 20px; border-radius: 50%; border: 2px solid var(--border); cursor: pointer; flex-shrink: 0; transition: all 0.2s; }
+  .todo-check.checked { background: var(--accent2); border-color: var(--accent2); }
+  .todo-text { flex: 1; font-size: 0.95rem; }
+  .todo-delete { color: var(--muted); cursor: pointer; font-size: 1.1rem; background: none; border: none; }
+  .todo-delete:hover { color: var(--accent); }
+
+  .stats-row {
+    display: flex;
+    gap: 12px;
+    margin-bottom: 24px;
+  }
+  .stat {
+    flex: 1;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 16px;
+    text-align: center;
+  }
+  .stat .num { font-size: 1.75rem; font-weight: 700; color: var(--accent); }
+  .stat .lbl { font-size: 0.75rem; color: var(--muted); margin-top: 2px; }
+
+  .empty-state {
+    text-align: center;
+    padding: 48px 0;
+    color: var(--muted);
+  }
+  .empty-state .icon { font-size: 3rem; margin-bottom: 12px; }
+
+  /* About page */
+  #about-section { display: none; text-align: center; padding: 60px 0; }
+  #about-section h2 { font-size: 2rem; margin-bottom: 16px; }
+  #about-section p { color: var(--muted); max-width: 400px; margin: 0 auto 32px; }
+  .feature-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; }
+  .feature-card { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 20px; text-align: center; }
+  .feature-card .icon { font-size: 2rem; margin-bottom: 10px; }
+  .feature-card h3 { font-size: 0.9rem; margin-bottom: 6px; }
+  .feature-card p { font-size: 0.8rem; color: var(--muted); }
+
+  .user-badge { 
+    background: var(--surface2); 
+    border: 1px solid var(--border);
+    border-radius: 20px;
+    padding: 4px 12px 4px 4px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 0.8rem;
+  }
+  .avatar { width: 28px; height: 28px; border-radius: 50%; background: var(--accent); display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 0.75rem; }
+
+  .filter-tabs { display: flex; gap: 4px; margin-bottom: 16px; }
+  .filter-tab { padding: 6px 14px; border-radius: 20px; font-size: 0.8rem; border: 1px solid var(--border); cursor: pointer; background: transparent; color: var(--muted); transition: all 0.2s; }
+  .filter-tab.active, .filter-tab:hover { background: var(--accent); border-color: var(--accent); color: white; }
+
+  #notification { position: fixed; bottom: 24px; right: 24px; background: var(--accent2); color: #0f0e17; padding: 12px 20px; border-radius: 10px; font-weight: 600; font-size: 0.875rem; transform: translateY(100px); opacity: 0; transition: all 0.3s; z-index: 100; }
+  #notification.show { transform: translateY(0); opacity: 1; }
+</style>
+</head>
+<body>
+
+<nav>
+  <span class="logo">⚡ TaskMaster</span>
+  <a href="#" class="active" id="nav-home">Home</a>
+  <a href="#" id="nav-about">About</a>
+  <a href="#" id="nav-settings">Settings</a>
+  <div class="nav-right" id="nav-auth-area">
+    <button class="btn btn-outline" id="btn-login-nav">Login</button>
+    <button class="btn btn-primary" id="btn-signup">Sign Up</button>
+  </div>
+</nav>
+
+<div class="hero">
+  <h1>Your tasks,<br/><span>beautifully organized</span></h1>
+  <p>The minimalist productivity app that gets out of your way.</p>
+</div>
+
+<div class="app-container">
+  <!-- Login Section -->
+  <div id="login-section">
+    <h2>Sign in to continue</h2>
+    <div class="form-group">
+      <label for="email">Email</label>
+      <input type="email" id="email" placeholder="you@example.com" autocomplete="email"/>
+    </div>
+    <div class="form-group">
+      <label for="password">Password</label>
+      <input type="password" id="password" placeholder="Your password"/>
+    </div>
+    <p class="error-msg" id="login-error">Invalid email or password. Please try again.</p>
+    <br/>
+    <button class="btn btn-primary" id="btn-login" style="width:100%">Login</button>
+  </div>
+
+  <!-- Todo Section -->
+  <div id="todo-section">
+    <div class="stats-row">
+      <div class="stat"><div class="num" id="stat-total">0</div><div class="lbl">Total</div></div>
+      <div class="stat"><div class="num" id="stat-done">0</div><div class="lbl">Done</div></div>
+      <div class="stat"><div class="num" id="stat-pending">0</div><div class="lbl">Pending</div></div>
+    </div>
+
+    <div class="filter-tabs">
+      <button class="filter-tab active" data-filter="all">All</button>
+      <button class="filter-tab" data-filter="active">Active</button>
+      <button class="filter-tab" data-filter="done">Done</button>
+    </div>
+
+    <div class="todo-input-row">
+      <input type="text" id="todo-input" placeholder="Add a new task..." aria-label="New task input"/>
+      <button class="btn btn-primary" id="btn-add-todo" aria-label="Add task">Add</button>
+    </div>
+
+    <ul class="todo-list" id="todo-list" aria-label="Task list"></ul>
+
+    <div class="empty-state" id="empty-state">
+      <div class="icon">📋</div>
+      <p>No tasks yet. Add one above!</p>
+    </div>
+  </div>
+
+  <!-- About Section -->
+  <div id="about-section">
+    <h2>About TaskMaster</h2>
+    <p>A simple, fast, and beautiful todo app built to demonstrate TestForge capabilities.</p>
+    <div class="feature-grid">
+      <div class="feature-card"><div class="icon">⚡</div><h3>Fast</h3><p>Instant updates, no loading</p></div>
+      <div class="feature-card"><div class="icon">🔒</div><h3>Secure</h3><p>Your data stays private</p></div>
+      <div class="feature-card"><div class="icon">🎨</div><h3>Beautiful</h3><p>Clean, modern interface</p></div>
+    </div>
+  </div>
+</div>
+
+<div id="notification"></div>
+
+<script>
+  // State
+  let todos = JSON.parse(localStorage.getItem('tm_todos') || '[]');
+  let currentFilter = 'all';
+  let loggedIn = false;
+
+  const VALID_USERS = [
+    { email: 'demo@test.com', password: 'password123' },
+    { email: 'admin@testforge.dev', password: 'admin123' },
+  ];
+
+  // Navigation
+  function showSection(section) {
+    document.getElementById('login-section').style.display = section === 'login' ? 'block' : 'none';
+    document.getElementById('todo-section').style.display = section === 'todos' ? 'block' : 'none';
+    document.getElementById('about-section').style.display = section === 'about' ? 'block' : 'none';
+  }
+
+  document.getElementById('nav-home').addEventListener('click', (e) => {
+    e.preventDefault();
+    showSection(loggedIn ? 'todos' : 'login');
+    document.querySelectorAll('nav a').forEach(a => a.classList.remove('active'));
+    e.target.classList.add('active');
+  });
+
+  document.getElementById('nav-about').addEventListener('click', (e) => {
+    e.preventDefault();
+    showSection('about');
+    document.querySelectorAll('nav a').forEach(a => a.classList.remove('active'));
+    e.target.classList.add('active');
+  });
+
+  document.getElementById('btn-login-nav').addEventListener('click', (e) => {
+    showSection('login');
+  });
+
+  // Login
+  document.getElementById('btn-login').addEventListener('click', () => {
+    const email = document.getElementById('email').value;
+    const password = document.getElementById('password').value;
+    const errEl = document.getElementById('login-error');
+
+    if (!email || !password) {
+      errEl.style.display = 'block';
+      errEl.textContent = 'Please fill in all fields.';
+      return;
+    }
+
+    const user = VALID_USERS.find(u => u.email === email && u.password === password);
+
+    if (user) {
+      errEl.style.display = 'none';
+      loggedIn = true;
+      document.getElementById('nav-auth-area').innerHTML = `
+        <div class="user-badge">
+          <div class="avatar">${email[0].toUpperCase()}</div>
+          ${email.split('@')[0]}
+        </div>
+        <button class="btn btn-outline" onclick="logout()">Logout</button>`;
+      showSection('todos');
+      renderTodos();
+      showNotification('👋 Welcome back!');
+    } else {
+      errEl.style.display = 'block';
+      errEl.textContent = 'Invalid email or password. Please try again.';
+    }
+  });
+
+  // Allow Enter key on login
+  document.getElementById('password').addEventListener('keydown', (e) => {
+    if (e.key === 'Enter') document.getElementById('btn-login').click();
+  });
+
+  function logout() {
+    loggedIn = false;
+    location.reload();
+  }
+
+  // Todos
+  document.getElementById('btn-add-todo').addEventListener('click', addTodo);
+  document.getElementById('todo-input').addEventListener('keydown', (e) => {
+    if (e.key === 'Enter') addTodo();
+  });
+
+  function addTodo() {
+    const input = document.getElementById('todo-input');
+    const text = input.value.trim();
+    if (!text) return;
+    todos.push({ id: Date.now(), text, done: false, created: new Date().toISOString() });
+    input.value = '';
+    saveTodos();
+    renderTodos();
+    showNotification('✅ Task added!');
+  }
+
+  function toggleTodo(id) {
+    const todo = todos.find(t => t.id === id);
+    if (todo) { todo.done = !todo.done; saveTodos(); renderTodos(); }
+  }
+
+  function deleteTodo(id) {
+    todos = todos.filter(t => t.id !== id);
+    saveTodos();
+    renderTodos();
+  }
+
+  function saveTodos() {
+    localStorage.setItem('tm_todos', JSON.stringify(todos));
+  }
+
+  function renderTodos() {
+    const list = document.getElementById('todo-list');
+    const empty = document.getElementById('empty-state');
+    
+    let filtered = todos;
+    if (currentFilter === 'active') filtered = todos.filter(t => !t.done);
+    if (currentFilter === 'done') filtered = todos.filter(t => t.done);
+
+    list.innerHTML = '';
+    empty.style.display = filtered.length === 0 ? 'block' : 'none';
+
+    filtered.forEach(todo => {
+      const li = document.createElement('li');
+      li.className = `todo-item ${todo.done ? 'done' : ''}`;
+      li.innerHTML = `
+        <div class="todo-check ${todo.done ? 'checked' : ''}" onclick="toggleTodo(${todo.id})" aria-label="Toggle task"></div>
+        <span class="todo-text">${todo.text}</span>
+        <button class="todo-delete" onclick="deleteTodo(${todo.id})" aria-label="Delete task">×</button>`;
+      list.appendChild(li);
+    });
+
+    document.getElementById('stat-total').textContent = todos.length;
+    document.getElementById('stat-done').textContent = todos.filter(t => t.done).length;
+    document.getElementById('stat-pending').textContent = todos.filter(t => !t.done).length;
+  }
+
+  // Filter tabs
+  document.querySelectorAll('.filter-tab').forEach(tab => {
+    tab.addEventListener('click', () => {
+      document.querySelectorAll('.filter-tab').forEach(t => t.classList.remove('active'));
+      tab.classList.add('active');
+      currentFilter = tab.dataset.filter;
+      renderTodos();
+    });
+  });
+
+  // Notification
+  function showNotification(msg) {
+    const n = document.getElementById('notification');
+    n.textContent = msg;
+    n.classList.add('show');
+    setTimeout(() => n.classList.remove('show'), 2500);
+  }
+
+  // Init - show login
+  showSection('login');
+</script>
+</body>
+</html>
