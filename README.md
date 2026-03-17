@@ -15,10 +15,9 @@ node --version      # 16+
 npm --version       # 8+
 ```
 
-### Step 2 — Unzip & Start
+### Step 2 — Start
 
 ```bash
-unzip testforge.zip
 cd testforge
 chmod +x start.bash
 ./start.bash
@@ -47,9 +46,9 @@ Your `.env` is already filled with your Azure credentials:
 
 ```env
 AZURE_OPENAI_API_KEY=YOUR_AZURE_API_KEY_HERE
-AZURE_OPENAI_ENDPOINT=https://argusllm.openai.azure.com/
-AZURE_OPENAI_DEPLOYMENT=gpt-4o
-AZURE_OPENAI_MODEL_DEPLOYMENT_NAME=gpt-4o
+AZURE_OPENAI_ENDPOINT=
+AZURE_OPENAI_DEPLOYMENT=
+AZURE_OPENAI_MODEL_DEPLOYMENT_NAME=
 ```
 
 The backend auto-loads `.env` on startup — no manual config needed.
